@@ -3,59 +3,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Календарь</title>
+    <title>Календарь событий</title>
+    
+    <!-- Link to External Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    /* General Page Styling */
+  <style>{
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 2rem;
+    color: #333;
+}
+
+/* Calendar Container Styling */
+.calendar-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+/* Weekday Names (Пн, Вт, Ср, ...) */
+.days-of-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 10px;
+}
+
+.day-name {
+    font-weight: bold;
+    text-align: center;
+    background-color: #4834d4;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Calendar Days */
+.day {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #6c5ce7;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    height: 50px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.day:hover {
+    background-color: #4834d4;
+    cursor: pointer;
+}
+
+.empty {
+    background-color: transparent;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+    #calendar {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
+
+    .day {
+        height: 40px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+
+@media (max-width: 480px) {
+    #calendar {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 3px;
+    }
+
+    .day {
+        height: 30px;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+}
+</style>
 </head>
 <body>
+
+    <!-- Title of the Calendar -->
     <h1>Календарь событий</h1>
+
+    <!-- Calendar Container -->
     <div class="calendar-container">
-        <!-- Здесь будет сгенерирован календарь -->
+        <!-- Calendar will be generated here dynamically -->
         <div id="calendar"></div>
     </div>
 
+    <!-- JavaScript to generate the calendar -->
     <script>
+        /**
+         * Generates a calendar for the given year and month.
+         * @param {number} year - The year of the calendar.
+         * @param {number} month - The month (1 = January, 12 = December).
+         */
         function generateCalendar(year, month) {
             const calendar = document.getElementById('calendar');
-            calendar.innerHTML = ''; // Очищаем содержимое перед генерацией
+            calendar.innerHTML = ''; // Clear existing calendar content
 
             const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-            const date = new Date(year, month - 1); // Месяцы начинаются с 0 (0 = январь)
-            const currentMonth = date.getMonth();
-            const firstDayOfWeek = new Date(year, month - 1, 1).getDay() || 7;
-            const daysInMonth = new Date(year, month, 0).getDate();
+            const date = new Date(year, month - 1); // Months are 0-indexed
+            const firstDayOfWeek = new Date(year, month - 1, 1).getDay() || 7; // Get first day of month (1 = Monday)
+            const daysInMonth = new Date(year, month, 0).getDate(); // Number of days in the month
 
-            // Создаем заголовок с днями недели
+            // 🔹 Create and append the day names (Пн, Вт, Ср, etc.)
             const daysOfWeekContainer = document.createElement('div');
             daysOfWeekContainer.classList.add('days-of-week');
-            daysOfWeek.forEach(day => {
+            daysOfWeek.forEach(dayName => {
                 const dayElement = document.createElement('div');
                 dayElement.classList.add('day-name');
-                dayElement.textContent = day;
+                dayElement.textContent = dayName;
                 daysOfWeekContainer.appendChild(dayElement);
             });
             calendar.appendChild(daysOfWeekContainer);
 
-            // Заполняем пустые дни перед первым днем месяца
+            // 🔹 Add empty blocks for days before the first day of the month
             for (let i = 1; i < firstDayOfWeek; i++) {
                 const emptyDay = document.createElement('div');
                 emptyDay.classList.add('day', 'empty');
                 calendar.appendChild(emptyDay);
             }
 
-            // Создаем числа месяца
+            // 🔹 Create the numbered days of the month
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayElement = document.createElement('a');
                 dayElement.classList.add('day');
-                const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                dayElement.href = `events/${dateString}.html`; // Ссылка на страницу с событиями
                 dayElement.textContent = day;
+
+                // Format date as YYYY-MM-DD
+                const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                dayElement.href = `events/${formattedDate}.html`; // Link to event page
                 calendar.appendChild(dayElement);
             }
         }
 
-        // Генерируем календарь для текущего месяца
+        // 🔹 Generate the calendar for the current month
         const today = new Date();
-        generateCalendar(today.getFullYear(), today.getMonth() + 1);
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1; // Month index is 0-based, so add 1
+        generateCalendar(currentYear, currentMonth);
     </script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь событий</title>
+    
+    <!-- Link to External Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    /* General Page Styling */
+  <style>{
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 2rem;
+    color: #333;
+}
+
+/* Calendar Container Styling */
+.calendar-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+/* Weekday Names (Пн, Вт, Ср, ...) */
+.days-of-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 10px;
+}
+
+.day-name {
+    font-weight: bold;
+    text-align: center;
+    background-color: #4834d4;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Calendar Days */
+.day {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #6c5ce7;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    height: 50px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.day:hover {
+    background-color: #4834d4;
+    cursor: pointer;
+}
+
+.empty {
+    background-color: transparent;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+    #calendar {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
+
+    .day {
+        height: 40px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+
+@media (max-width: 480px) {
+    #calendar {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 3px;
+    }
+
+    .day {
+        height: 30px;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+}
+</style>
+</head>
+<body>
+
+    <!-- Title of the Calendar -->
+    <h1>Календарь событий</h1>
+
+    <!-- Calendar Container -->
+    <div class="calendar-container">
+        <!-- Calendar will be generated here dynamically -->
+        <div id="calendar"></div>
+    </div>
+
+    <!-- JavaScript to generate the calendar -->
+    <script>
+        /**
+         * Generates a calendar for the given year and month.
+         * @param {number} year - The year of the calendar.
+         * @param {number} month - The month (1 = January, 12 = December).
+         */
+        function generateCalendar(year, month) {
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = ''; // Clear existing calendar content
+
+            const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+            const date = new Date(year, month - 1); // Months are 0-indexed
+            const firstDayOfWeek = new Date(year, month - 1, 1).getDay() || 7; // Get first day of month (1 = Monday)
+            const daysInMonth = new Date(year, month, 0).getDate(); // Number of days in the month
+
+            // 🔹 Create and append the day names (Пн, Вт, Ср, etc.)
+            const daysOfWeekContainer = document.createElement('div');
+            daysOfWeekContainer.classList.add('days-of-week');
+            daysOfWeek.forEach(dayName => {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('day-name');
+                dayElement.textContent = dayName;
+                daysOfWeekContainer.appendChild(dayElement);
+            });
+            calendar.appendChild(daysOfWeekContainer);
+
+            // 🔹 Add empty blocks for days before the first day of the month
+            for (let i = 1; i < firstDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.classList.add('day', 'empty');
+                calendar.appendChild(emptyDay);
+            }
+
+            // 🔹 Create the numbered days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('a');
+                dayElement.classList.add('day');
+                dayElement.textContent = day;
+
+                // Format date as YYYY-MM-DD
+                const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                dayElement.href = `events/${formattedDate}.html`; // Link to event page
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        // 🔹 Generate the calendar for the current month
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1; // Month index is 0-based, so add 1
+        generateCalendar(currentYear, currentMonth);
+    </script>
+
 </body>
 </html>
