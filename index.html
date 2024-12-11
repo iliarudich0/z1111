@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Календарь событий</h1>
+    <div class="calendar-container">
+        <!-- Здесь будет сгенерирован календарь -->
+        <div id="calendar"></div>
+    </div>
+
+    <script>
+        function generateCalendar(year, month) {
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = ''; // Очищаем содержимое перед генерацией
+
+            const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+            const date = new Date(year, month - 1); // Месяцы начинаются с 0 (0 = январь)
+            const currentMonth = date.getMonth();
+            const firstDayOfWeek = new Date(year, month - 1, 1).getDay() || 7;
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            // Создаем заголовок с днями недели
+            const daysOfWeekContainer = document.createElement('div');
+            daysOfWeekContainer.classList.add('days-of-week');
+            daysOfWeek.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('day-name');
+                dayElement.textContent = day;
+                daysOfWeekContainer.appendChild(dayElement);
+            });
+            calendar.appendChild(daysOfWeekContainer);
+
+            // Заполняем пустые дни перед первым днем месяца
+            for (let i = 1; i < firstDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.classList.add('day', 'empty');
+                calendar.appendChild(emptyDay);
+            }
+
+            // Создаем числа месяца
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('a');
+                dayElement.classList.add('day');
+                const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                dayElement.href = `events/${dateString}.html`; // Ссылка на страницу с событиями
+                dayElement.textContent = day;
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        // Генерируем календарь для текущего месяца
+        const today = new Date();
+        generateCalendar(today.getFullYear(), today.getMonth() + 1);
+    </script>
+</body>
+</html>
